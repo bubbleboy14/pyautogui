@@ -23,6 +23,9 @@ ISGNOME = os.getenv("XDG_CURRENT_DESKTOP") == "ubuntu:GNOME"
 if ISGNOME:
     try:
         import gnomopo
+        SIZE = gnomopo.getsize()
+        SCALING = SIZE.pop()
+        print("SIZE", SIZE, "SCALING", SCALING)
     except:
         print("\n\nyou're running ubuntu gnome!")
         print("you need gnomopo for mouse position and screen sizing, so do this:\n")
@@ -53,11 +56,8 @@ def _size():
     global SIZE
     if SIZE is not None:
         return SIZE
-    if ISGNOME:
-        SIZE = gnomopo.getsize()
-    else:
-        im: Image.Image = pyscreenshot.grab()
-        SIZE = im.size
+    im: Image.Image = pyscreenshot.grab()
+    SIZE = im.size
     return SIZE
 
 
@@ -68,7 +68,7 @@ def _moveTo(x, y):
 
             
 
-if "Getting constant values":
+if "Getting constant values" and not ISGNOME:
     init_x, init_y = _position()
     w, h = _size()
     
