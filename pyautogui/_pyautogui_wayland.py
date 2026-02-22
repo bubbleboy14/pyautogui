@@ -18,7 +18,7 @@ import time
 
 SCALING = 1
 SIZE = None
-
+_display = None
 ISGNOME = os.getenv("XDG_CURRENT_DESKTOP") == "ubuntu:GNOME"
 if ISGNOME:
     try:
@@ -35,6 +35,14 @@ if ISGNOME:
         print("4) $> gnomopo enable\n")
         print("then pyautogui should work fine\n\n")
 
+def setWindow(offset=0):
+    global _display, SIZE
+    _display = gnomopo.getwindow(rect="frame")
+    _display["y"] -= offset # browser address bar etc
+    _display["height"] -= offset
+    print("using window geo", _display)
+    SIZE = [_display["width"], _display["height"]]
+
 def _position():
     """Returns the current xy coordinates of the mouse cursor as a two-integer
     tuple.
@@ -48,6 +56,9 @@ def _position():
         gen = wayland_automation.mouse_position_generator()
         x, y = next(gen)
         gen.close()
+    if _display:
+        x -= _display["x"]
+        y -= _display["y"]
     x, y = x*SCALING, y*SCALING
     return x, y
 
@@ -64,6 +75,9 @@ def _size():
 def _moveTo(x, y):
     new_x = ((x)/(SCALING))
     new_y = ((y)/(SCALING))
+    if _display:
+        new_x += _display["x"]
+        new_y += _display["y"]
     subprocess.run(["ydotool", "mousemove", "-a", "-x", str(new_x), "-y", str(new_y)])
 
             
